@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Financeiro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a, #020617);
+            color: white;
+            min-height: 100vh;
+        }
+
+        header {
+            padding: 20px 25px 0;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+        }
+
+        header h1 {
+            margin: 0 0 18px;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+        }
+
+        .tab {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 12px 12px 0 0;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.5px;
+            background: rgba(255, 255, 255, 0.04);
+            color: #64748b;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .tab:hover {
+            color: #94a3b8;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .tab.active {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 3px;
+            border-radius: 3px 3px 0 0;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+        }
+
+        .container {
+            padding: 25px;
+        }
+
+        .sheet {
+            display: none;
+        }
+
+        .sheet.active {
+            display: block;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== FORM ===== */
+        .form-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        input,
+        select {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 11px 14px;
+            border-radius: 10px;
+            color: white;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: rgba(99, 102, 241, 0.6);
+        }
+
+        select {
+            appearance: none;
+            background: rgba(255, 255, 255, 0.08) url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>") no-repeat right 8px center;
+            background-size: 16px;
+            padding-right: 30px;
+            cursor: pointer;
+        }
+
+        option {
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+
+        option:checked {
+            background: #334155;
+        }
+
+        button {
+            padding: 11px 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-add {
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            color: black;
+        }
+
+        /* ===== SUMMARY ===== */
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .summary div {
+            background: rgba(255, 255, 255, 0.06);
+            padding: 16px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .summary .big {
+            font-size: 17px;
+        }
+
+        .meta-ok {
+            background: linear-gradient(90deg, #22c55e, #15803d) !important;
+        }
+
+        /* ===== TABLE ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin-top: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            white-space: nowrap;
+        }
+
+        th,
+        td {
+            padding: 10px 8px;
+            font-size: 12px;
+            text-align: left;
+        }
+
+        th {
+            color: #94a3b8;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: sticky;
+            top: 0;
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        /* ===== ACTION BTNS ===== */
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 11px;
+            border-radius: 6px;
+            margin: 1px;
+        }
+
+        .btn-edit {
+            background: rgba(99, 102, 241, 0.2);
+            color: #818cf8;
+        }
+
+        .btn-edit:hover {
+            background: rgba(99, 102, 241, 0.35);
+        }
+
+        .btn-del {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .btn-del:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        /* ===== VALIDATION BADGE ===== */
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+        }
+
+        .badge-pendente {
+            background: rgba(234, 179, 8, 0.15);
+            color: #eab308;
+        }
+
+        .badge-validado {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+        }
+
+        .badge-pendente:hover {
+            background: rgba(234, 179, 8, 0.3);
+        }
+
+        .badge-validado:hover {
+            background: rgba(34, 197, 94, 0.3);
+        }
+
+        /* ===== SETTINGS BTN ===== */
+        .settings-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            font-size: 20px;
+            color: white;
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .settings-btn:hover {
+            transform: translateY(-3px) rotate(90deg);
+            box-shadow: 0 12px 40px rgba(99, 102, 241, 0.6);
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 28px;
+            border-radius: 20px;
+            width: 440px;
+            max-width: 92vw;
+            max-height: 88vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 17px;
+        }
+
+        .modal-close {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            color: #94a3b8;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .modal-close:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .config-group {
+            margin-bottom: 16px;
+        }
+
+        .config-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .config-group input,
+        .config-group select {
+            width: 100%;
+            margin: 0;
+            padding: 12px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .config-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .config-divider {
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            margin: 16px 0;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 13px;
+            font-size: 14px;
+        }
+
+        .btn-save {
+            background: linear-gradient(90deg, #6366f1, #4f46e5);
+            color: white;
+        }
+
+        .btn-cancel {
+            background: rgba(255, 255, 255, 0.06);
+            color: #94a3b8;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* ===== CONVERSÃO ===== */
+        .conversao-section {
+            margin-top: 18px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+        }
+
+        .conversao-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .conversao-header span {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            cursor: pointer;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            position: absolute;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 26px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle-switch input:checked+.toggle-slider {
+            background: linear-gradient(90deg, #22c55e, #15803d);
+        }
+
+        .toggle-switch input:checked+.toggle-slider::before {
+            transform: translateX(22px);
+        }
+
+        .conversao-config {
+            display: none;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .conversao-config.show {
+            display: block;
+        }
+
+        .conversao-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .conversao-row label {
+            font-size: 13px;
+            color: #94a3b8;
+            min-width: 110px;
+        }
+
+        .conversao-row input {
+            width: 120px;
+            margin: 0;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .bateu-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .bateu-btn span {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .bateu-status {
+            font-size: 12px;
+            margin-left: auto;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .bateu-status.sim {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+        }
+
+        .bateu-status.nao {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .ganho-sim {
+            color: #22c55e;
+        }
+
+        .ganho-nao {
+            color: #ef4444;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>💰 Dashboard Financeiro</h1>
+        <div class="tabs">
+            <button class="tab active" onclick="trocarAba('sdr')" id="tabSdr">📞 SDR</button>
+            <button class="tab" onclick="trocarAba('closer')" id="tabCloser">🤝 Closer</button>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- ============ SDR ============ -->
+        <div class="sheet active" id="sheetSdr">
+            <div class="card">
+                <input type="month" id="filtroMesSdr">
+            </div>
+
+            <div class="card">
+                <h3>Lançar Venda · SDR</h3>
+                <div class="form-grid">
+                    <input placeholder="ID" id="idSdr" style="width:70px">
+                    <input placeholder="Cliente" id="clienteSdr">
+                    <input placeholder="Telefone" id="telefoneSdr" style="width:120px">
+                    <select id="sdrNome">
+                        <option value="">SDR</option>
+                        <option>João Martins</option>
+                        <option>Neder</option>
+                        <option>Muller</option>
+                        <option>Wesley</option>
+                        <option>Ton</option>
+                        <option>Guilherme Moura</option>
+                        <option>Allan</option>
+                        <option>Paulo</option>
+                        <option>Rodolpho</option>
+                        <option>Edilson</option>
+                        <option>Wender</option>
+                    </select>
+                    <select id="closerSdr">
+                        <option value="">Closer</option>
+                        <option>Josué</option>
+                        <option>Parreira</option>
+                        <option>Higor</option>
+                        <option>Penha</option>
+                        <option>João Barbosa</option>
+                        <option>Lucas Henrique</option>
+                    </select>
+                    <select id="contasSdr">
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                        <option>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                        <option>9</option>
+                        <option>10</option>
+                    </select>
+                    <input type="number" placeholder="Comissão (R$)" id="comissaoManualSdr" style="width:120px">
+                    <input type="number" placeholder="Valor Vendido (R$)" id="valorVendidoSdr" style="width:130px">
+                    <select id="ganhoSdr">
+                        <option value="sim">Ganho</option>
+                        <option value="nao">Não Ganho</option>
+                    </select>
+                    <input type="date" id="dataVendaSdr">
+                    <button class="btn-add" onclick="addVenda('sdr')">Adicionar</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Registros</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Tel</th>
+                                <th>SDR</th>
+                                <th>Closer</th>
+                                <th>Contas</th>
+                                <th>Comissão</th>
+                                <th>Valor Vendido</th>
+                                <th>Ganho</th>
+                                <th>Data</th>
+                                <th>Contrato</th>
+                                <th>RH</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listaSdr"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Resumo Financeiro · SDR</h3>
+                <div class="summary">
+                    <div>Salário Fixo<br><b>R$ <span id="salarioFixoSdr">0</span></b></div>
+                    <div>Comissões<br><b>R$ <span id="comissaoSdr">0</span></b></div>
+                    <div>Bônus<br><b>R$ <span id="bonusSdr">0</span></b></div>
+                    <div style="font-weight:800">Bruto<br><b>R$ <span id="brutoSdr">0</span></b></div>
+                    <div style="color:#ef4444">INSS<br><b>-R$ <span id="inssValSdr">0</span></b></div>
+                    <div style="color:#ef4444">Despesa 4,5%<br><b>-R$ <span id="despesaValSdr">0</span></b></div>
+                    <div>Vendas Totais<br><b><span id="vendasRealizadasSdr">0</span></b></div>
+                    <div>Faturamento Total<br><b>R$ <span id="faturamentoTotalSdr">0</span></b></div>
+                    <div id="metaCardSdr">Contas/Fat Meta<br><b><span id="contasMetaSdr">0</span></b></div>
+                    <div class="big" style="color:#22c55e">Líquido<br><b>R$ <span id="totalFinalSdr">0</span></b></div>
+                </div>
+
+                <div class="conversao-section">
+                    <div class="conversao-header">
+                        <span>🎯 Conversão</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="temConversaoSdr" onchange="toggleTemConversao('sdr')">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="conversao-config" id="conversaoConfigSdr">
+                        <div class="conversao-row">
+                            <label>Bônus (R$):</label>
+                            <input type="number" id="bonusConversaoInputSdr" placeholder="300"
+                                onchange="salvarBonusConversao('sdr')">
+                        </div>
+                        <div class="bateu-btn">
+                            <span>Bateu conversão?</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="bateuConversaoToggleSdr"
+                                    onchange="toggleBateuConversao('sdr')">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="bateu-status nao" id="bateuStatusSdr">NÃO</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ CLOSER ============ -->
+        <div class="sheet" id="sheetCloser">
+            <div class="card">
+                <input type="month" id="filtroMesCloser">
+            </div>
+
+            <div class="card">
+                <h3>Lançar Venda · Closer</h3>
+                <div class="form-grid">
+                    <input placeholder="ID" id="idCloser" style="width:70px">
+                    <input placeholder="Cliente" id="clienteCloser">
+                    <input placeholder="Telefone" id="telefoneCloser" style="width:120px">
+                    <select id="sdrNomeCloser">
+                        <option value="">SDR</option>
+                        <option>João Martins</option>
+                        <option>Neder</option>
+                        <option>Muller</option>
+                        <option>Wesley</option>
+                        <option>Ton</option>
+                        <option>Guilherme Moura</option>
+                        <option>Allan</option>
+                        <option>Paulo</option>
+                        <option>Rodolpho</option>
+                        <option>Edilson</option>
+                        <option>Wender</option>
+                    </select>
+                    <select id="closerNome">
+                        <option value="">Closer</option>
+                        <option>Josué</option>
+                        <option>Parreira</option>
+                        <option>Higor</option>
+                        <option>Penha</option>
+                        <option>João Barbosa</option>
+                        <option>Lucas Henrique</option>
+                    </select>
+                    <select id="contasCloser">
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                        <option>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                        <option>9</option>
+                        <option>10</option>
+                    </select>
+                    <input type="number" placeholder="Comissão (R$)" id="comissaoManualCloser" style="width:120px">
+                    <input type="number" placeholder="Valor Vendido (R$)" id="valorVendidoCloser" style="width:130px">
+                    <select id="ganhoCloser">
+                        <option value="sim">Ganho</option>
+                        <option value="nao">Não Ganho</option>
+                    </select>
+                    <input type="date" id="dataVendaCloser">
+                    <button class="btn-add" onclick="addVenda('closer')">Adicionar</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Registros</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Tel</th>
+                                <th>SDR</th>
+                                <th>Closer</th>
+                                <th>Contas</th>
+                                <th>Comissão</th>
+                                <th>Valor Vendido</th>
+                                <th>Ganho</th>
+                                <th>Data</th>
+                                <th>Contrato</th>
+                                <th>RH</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listaCloser"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Resumo Financeiro · Closer</h3>
+                <div class="summary">
+                    <div>Salário Fixo<br><b>R$ <span id="salarioFixoCloser">0</span></b></div>
+                    <div>Comissões<br><b>R$ <span id="comissaoCloser">0</span></b></div>
+                    <div>Bônus<br><b>R$ <span id="bonusCloser">0</span></b></div>
+                    <div style="font-weight:800">Bruto<br><b>R$ <span id="brutoCloser">0</span></b></div>
+                    <div style="color:#ef4444">INSS<br><b>-R$ <span id="inssValCloser">0</span></b></div>
+                    <div style="color:#ef4444">Despesa 4,5%<br><b>-R$ <span id="despesaValCloser">0</span></b></div>
+                    <div>Vendas Totais<br><b><span id="vendasRealizadasCloser">0</span></b></div>
+                    <div>Faturamento Total<br><b>R$ <span id="faturamentoTotalCloser">0</span></b></div>
+                    <div id="metaCardCloser">Contas/Fat Meta<br><b><span id="contasMetaCloser">0</span></b></div>
+                    <div class="big" style="color:#22c55e">Líquido<br><b>R$ <span id="totalFinalCloser">0</span></b>
+                    </div>
+                </div>
+
+                <div class="conversao-section">
+                    <div class="conversao-header">
+                        <span>🎯 Conversão</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="temConversaoCloser" onchange="toggleTemConversao('closer')">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="conversao-config" id="conversaoConfigCloser">
+                        <div class="conversao-row">
+                            <label>Bônus (R$):</label>
+                            <input type="number" id="bonusConversaoInputCloser" placeholder="300"
+                                onchange="salvarBonusConversao('closer')">
+                        </div>
+                        <div class="bateu-btn">
+                            <span>Bateu conversão?</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="bateuConversaoToggleCloser"
+                                    onchange="toggleBateuConversao('closer')">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="bateu-status nao" id="bateuStatusCloser">NÃO</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings -->
+    <button class="settings-btn" onclick="abrirConfig()">⚙</button>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>⚙ Configurações · <span id="modalTipo">SDR</span></h3>
+                <button class="modal-close" onclick="fecharConfig()">✕</button>
+            </div>
+            <div class="config-group">
+                <label>Tipo de Meta</label>
+                <select id="cfgTipoMeta" onchange="alternarCamposMeta()">
+                    <option value="contas">Por Contas</option>
+                    <option value="faturamento">Por Faturamento</option>
+                </select>
+            </div>
+
+            <div id="metaContasCampos">
+                <div class="config-row">
+                    <div class="config-group"><label>Contas Meta</label><input type="number" id="cfgMeta"></div>
+                    <div class="config-group"><label>Bônus Meta (R$)</label><input type="number" id="cfgBonusMeta">
+                    </div>
+                </div>
+                <hr class="config-divider">
+                <div class="config-row">
+                    <div class="config-group"><label>Contas Super Meta</label><input type="number" id="cfgSuperMeta">
+                    </div>
+                    <div class="config-group"><label>Bônus Super Meta (R$)</label><input type="number"
+                            id="cfgBonusSuperMeta"></div>
+                </div>
+            </div>
+
+            <div id="metaFaturamentoCampos" style="display:none">
+                <div class="config-row">
+                    <div class="config-group"><label>Faturamento Meta (R$)</label><input type="number" id="cfgMetaFat">
+                    </div>
+                    <div class="config-group"><label>Bônus Meta (R$)</label><input type="number" id="cfgBonusMetaFat">
+                    </div>
+                </div>
+                <hr class="config-divider">
+                <div class="config-row">
+                    <div class="config-group"><label>Faturamento Super Meta (R$)</label><input type="number"
+                            id="cfgSuperMetaFat"></div>
+                    <div class="config-group"><label>Bônus Super Meta (R$)</label><input type="number"
+                            id="cfgBonusSuperMetaFat"></div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="fecharConfig()">Cancelar</button>
+                <button class="btn-save" onclick="salvarConfig()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>✏️ Editar Venda</h3>
+                <button class="modal-close" onclick="fecharEdit()">✕</button>
+            </div>
+            <div class="config-group"><label>ID</label><input id="editId"></div>
+            <div class="config-group"><label>Cliente</label><input id="editCliente"></div>
+            <div class="config-group"><label>Telefone</label><input id="editTelefone"></div>
+            <div class="config-group" id="editSdrGroup"><label>SDR</label><select id="editSdr">
+                    <option value="">SDR</option>
+                    <option>João Martins</option>
+                    <option>Neder</option>
+                    <option>Muller</option>
+                    <option>Wesley</option>
+                    <option>Ton</option>
+                    <option>Guilherme Moura</option>
+                    <option>Allan</option>
+                    <option>Paulo</option>
+                    <option>Rodolpho</option>
+                    <option>Edilson</option>
+                    <option>Wender</option>
+                </select></div>
+            <div class="config-group"><label>Closer</label><select id="editCloser">
+                    <option value="">Closer</option>
+                    <option>Josué</option>
+                    <option>Parreira</option>
+                    <option>Higor</option>
+                    <option>Penha</option>
+                    <option>João Barbosa</option>
+                    <option>Lucas Henrique</option>
+                </select></div>
+            <div class="config-row">
+                <div class="config-group"><label>Contas</label><select id="editContas">
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                        <option>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                        <option>9</option>
+                        <option>10</option>
+                    </select></div>
+                <div class="config-group"><label>Comissão (R$)</label><input type="number" id="editComissao"></div>
+            </div>
+            <div class="config-group"><label>Valor Vendido (R$)</label><input type="number" id="editValorVendido"></div>
+            <div class="config-row">
+                <div class="config-group"><label>Ganho</label><select id="editGanho">
+                        <option value="sim">Ganho</option>
+                        <option value="nao">Não Ganho</option>
+                    </select></div>
+                <div class="config-group"><label>Data</label><input type="date" id="editData"></div>
+            </div>
+            <div class="config-group"><label>Contrato</label><select id="editContrato">
+                    <option>Pendente</option>
+                    <option>Assinou</option>
+                    <option>Não Assinou</option>
+                </select></div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="fecharEdit()">Cancelar</button>
+                <button class="btn-save" onclick="salvarEdicao()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        let abaAtiva = localStorage.getItem("abaAtiva") || "sdr";
+
+        let defaultConfigSdr = {
+            salarioFixo: 2500, inss: 324.20, despesaPct: 4.50,
+            tipoMeta: "contas", // "contas" ou "faturamento"
+            meta: 20, superMeta: 30, bonusMeta: 500, bonusSuperMeta: 1000,
+            metaFat: 10000, superMetaFat: 20000, bonusMetaFat: 500, bonusSuperMetaFat: 1000,
+            bonusConversao: 300, temConversao: false, bateuConversao: false
+        };
+
+        let defaultConfigCloser = {
+            salarioFixo: 2250, inss: 324.20, despesaPct: 4.50,
+            tipoMeta: "contas",
+            meta: 20, superMeta: 30, bonusMeta: 500, bonusSuperMeta: 1000,
+            metaFat: 15000, superMetaFat: 30000, bonusMetaFat: 500, bonusSuperMetaFat: 1000,
+            bonusConversao: 300, temConversao: false, bateuConversao: false
+        };
+
+        let configSdr = { ...defaultConfigSdr, ...(JSON.parse(localStorage.getItem("configSdr")) || {}) };
+        let configCloser = { ...defaultConfigCloser, ...(JSON.parse(localStorage.getItem("configCloser")) || {}) };
+
+        // Forçar valores se vierem zerados de migrações anteriores
+        if (!configSdr.salarioFixo) configSdr.salarioFixo = 2500;
+        if (!configCloser.salarioFixo) configCloser.salarioFixo = 2250;
+        if (!configSdr.inss) configSdr.inss = 324.20;
+        if (!configCloser.inss) configCloser.inss = 324.20;
+
+        let vendasSdr = JSON.parse(localStorage.getItem("vendasSdr")) || [];
+        let vendasCloser = JSON.parse(localStorage.getItem("vendasCloser")) || [];
+
+        let editTipo = "", editIdx = -1;
+
+        // ===== UTILS =====
+        function sfx(tipo) { return tipo === "sdr" ? "Sdr" : "Closer"; }
+        function cfg(tipo) { return tipo === "sdr" ? configSdr : configCloser; }
+        function vendas(tipo) { return tipo === "sdr" ? vendasSdr : vendasCloser; }
+        function saveVendas(tipo) { localStorage.setItem("vendas" + sfx(tipo), JSON.stringify(vendas(tipo))); }
+        function saveCfg(tipo) { localStorage.setItem("config" + sfx(tipo), JSON.stringify(cfg(tipo))); }
+
+        // ===== TABS =====
+        function trocarAba(tipo) {
+            abaAtiva = tipo;
+            localStorage.setItem("abaAtiva", tipo);
+            document.getElementById("sheetSdr").classList.toggle("active", tipo === "sdr");
+            document.getElementById("sheetCloser").classList.toggle("active", tipo === "closer");
+            document.getElementById("tabSdr").classList.toggle("active", tipo === "sdr");
+            document.getElementById("tabCloser").classList.toggle("active", tipo === "closer");
+        }
+
+        // ===== CONVERSÃO =====
+        function initConversao(tipo) {
+            let c = cfg(tipo), s = sfx(tipo);
+            document.getElementById("temConversao" + s).checked = c.temConversao || false;
+            document.getElementById("bateuConversaoToggle" + s).checked = c.bateuConversao || false;
+            document.getElementById("bonusConversaoInput" + s).value = c.bonusConversao || 300;
+            toggleTemConversao(tipo);
+            atualizarBateuStatus(tipo);
+        }
+
+        function toggleTemConversao(tipo) {
+            let c = cfg(tipo), s = sfx(tipo);
+            c.temConversao = document.getElementById("temConversao" + s).checked;
+            document.getElementById("conversaoConfig" + s).classList.toggle("show", c.temConversao);
+            saveCfg(tipo); atualizar(tipo);
+        }
+
+        function toggleBateuConversao(tipo) {
+            let c = cfg(tipo), s = sfx(tipo);
+            c.bateuConversao = document.getElementById("bateuConversaoToggle" + s).checked;
+            atualizarBateuStatus(tipo); saveCfg(tipo); atualizar(tipo);
+        }
+
+        function atualizarBateuStatus(tipo) {
+            let c = cfg(tipo), el = document.getElementById("bateuStatus" + sfx(tipo));
+            el.textContent = c.bateuConversao ? "SIM ✅" : "NÃO";
+            el.className = "bateu-status " + (c.bateuConversao ? "sim" : "nao");
+        }
+
+        function salvarBonusConversao(tipo) {
+            cfg(tipo).bonusConversao = parseFloat(document.getElementById("bonusConversaoInput" + sfx(tipo)).value) || 0;
+            saveCfg(tipo); atualizar(tipo);
+        }
+
+        // ===== SETTINGS =====
+        function abrirConfig() {
+            modal.style.display = "flex";
+            let c = cfg(abaAtiva);
+            document.getElementById("modalTipo").textContent = abaAtiva.toUpperCase();
+
+            cfgTipoMeta.value = c.tipoMeta || "contas";
+            cfgMeta.value = c.meta; cfgBonusMeta.value = c.bonusMeta;
+            cfgSuperMeta.value = c.superMeta; cfgBonusSuperMeta.value = c.bonusSuperMeta;
+
+            cfgMetaFat.value = c.metaFat || 0; cfgBonusMetaFat.value = c.bonusMetaFat || 0;
+            cfgSuperMetaFat.value = c.superMetaFat || 0; cfgBonusSuperMetaFat.value = c.bonusSuperMetaFat || 0;
+
+            alternarCamposMeta();
+        }
+
+        function alternarCamposMeta() {
+            let tipo = cfgTipoMeta.value;
+            document.getElementById("metaContasCampos").style.display = tipo === "contas" ? "block" : "none";
+            document.getElementById("metaFaturamentoCampos").style.display = tipo === "faturamento" ? "block" : "none";
+        }
+
+        function fecharConfig() { modal.style.display = "none"; }
+
+        function salvarConfig() {
+            let c = cfg(abaAtiva);
+            c.tipoMeta = cfgTipoMeta.value;
+            c.meta = parseInt(cfgMeta.value); c.bonusMeta = parseFloat(cfgBonusMeta.value);
+            c.superMeta = parseInt(cfgSuperMeta.value); c.bonusSuperMeta = parseFloat(cfgBonusSuperMeta.value);
+
+            c.metaFat = parseFloat(cfgMetaFat.value); c.bonusMetaFat = parseFloat(cfgBonusMetaFat.value);
+            c.superMetaFat = parseFloat(cfgSuperMetaFat.value); c.bonusSuperMetaFat = parseFloat(cfgBonusSuperMetaFat.value);
+
+            saveCfg(abaAtiva); fecharConfig(); atualizar(abaAtiva);
+        }
+
+        modal.addEventListener("click", e => { if (e.target === modal) fecharConfig(); });
+
+        // ===== ADD VENDA =====
+        function addVenda(tipo) {
+            let s = sfx(tipo), v = vendas(tipo);
+            let obj = {
+                id: document.getElementById("id" + s).value,
+                cliente: document.getElementById("cliente" + s).value,
+                telefone: document.getElementById("telefone" + s).value,
+                contas: parseInt(document.getElementById("contas" + s).value),
+                comissao: parseFloat(document.getElementById("comissaoManual" + s).value) || 0,
+                valorVendido: parseFloat(document.getElementById("valorVendido" + s).value) || 0,
+                ganho: document.getElementById("ganho" + s).value,
+                data: document.getElementById("dataVenda" + s).value,
+                contrato: "Pendente",
+                validado: false
+            };
+
+            if (tipo === "sdr") {
+                obj.sdr = document.getElementById("sdrNome").value;
+                obj.closer = document.getElementById("closerSdr").value;
+            } else {
+                obj.sdr = document.getElementById("sdrNomeCloser").value;
+                obj.closer = document.getElementById("closerNome").value;
+            }
+
+            v.push(obj);
+            saveVendas(tipo);
+
+            // Limpar
+            document.getElementById("id" + s).value = "";
+            document.getElementById("cliente" + s).value = "";
+            document.getElementById("telefone" + s).value = "";
+            document.getElementById("comissaoManual" + s).value = "";
+            document.getElementById("valorVendido" + s).value = "";
+            document.getElementById("dataVenda" + s).value = "";
+            atualizar(tipo);
+        }
+
+        // ===== DELETE =====
+        function deletarVenda(tipo, i) {
+            if (!confirm("Excluir esta venda?")) return;
+            vendas(tipo).splice(i, 1);
+            saveVendas(tipo); atualizar(tipo);
+        }
+
+        // ===== EDIT =====
+        function editarVenda(tipo, i) {
+            editTipo = tipo; editIdx = i;
+            let v = vendas(tipo)[i];
+            editId.value = v.id || "";
+            editCliente.value = v.cliente || "";
+            editTelefone.value = v.telefone || "";
+            editContas.value = v.contas;
+            editComissao.value = v.comissao || 0;
+            editValorVendido.value = v.valorVendido || 0;
+            editGanho.value = v.ganho;
+            editData.value = v.data || "";
+            editContrato.value = v.contrato || "Pendente";
+
+            editSdrGroup.style.display = "block";
+            editSdr.value = v.sdr || "";
+            editCloser.value = v.closer || "";
+
+            editModal.style.display = "flex";
+        }
+
+        function fecharEdit() { editModal.style.display = "none"; }
+
+        function salvarEdicao() {
+            let v = vendas(editTipo)[editIdx];
+            v.id = editId.value;
+            v.cliente = editCliente.value;
+            v.telefone = editTelefone.value;
+            v.contas = parseInt(editContas.value);
+            v.comissao = parseFloat(editComissao.value) || 0;
+            v.valorVendido = parseFloat(editValorVendido.value) || 0;
+            v.ganho = editGanho.value;
+            v.data = editData.value;
+            v.contrato = editContrato.value;
+
+            v.sdr = editSdr.value;
+            v.closer = editCloser.value;
+
+            saveVendas(editTipo); fecharEdit(); atualizar(editTipo);
+        }
+
+        editModal.addEventListener("click", e => { if (e.target === editModal) fecharEdit(); });
+
+        // ===== VALIDAR RH =====
+        function validarVenda(tipo, i) {
+            let v = vendas(tipo)[i];
+            v.validado = !v.validado;
+            saveVendas(tipo); atualizar(tipo);
+        }
+
+        // ===== CONTRATO =====
+        function alterarContrato(tipo, i, val) {
+            vendas(tipo)[i].contrato = val;
+            saveVendas(tipo);
+        }
+
+        // ===== ATUALIZAR =====
+        function atualizar(tipo) {
+            let s = sfx(tipo), c = cfg(tipo), vds = vendas(tipo);
+            let filtro = document.getElementById("filtroMes" + s).value;
+            let lista = document.getElementById("lista" + s);
+            lista.innerHTML = "";
+
+            let totalComissao = 0, totalContas = 0, totalFaturamento = 0, totalVendasRealizadas = 0;
+
+            vds.forEach((v, i) => {
+                if (!filtro || (v.data && v.data.startsWith(filtro))) {
+                    if (v.ganho === "sim") {
+                        totalComissao += (v.comissao || 0);
+                        totalContas += v.contas;
+                        totalFaturamento += (v.valorVendido || 0);
+                        totalVendasRealizadas++;
+                    }
+
+                    let closerCol = `<td>${v.sdr || '-'}</td><td>${v.closer || '-'}</td>`;
+
+                    let badgeClass = v.validado ? "badge-validado" : "badge-pendente";
+                    let badgeText = v.validado ? "✅ Validado" : "⏳ Pendente";
+
+                    lista.innerHTML += `<tr>
+                        <td>${v.id || '-'}</td>
+                        <td>${v.cliente || '-'}</td>
+                        <td>${v.telefone || '-'}</td>
+                        ${closerCol}
+                        <td>${v.contas}</td>
+                        <td>R$ ${(v.comissao || 0).toFixed(2)}</td>
+                        <td>R$ ${(v.valorVendido || 0).toFixed(2)}</td>
+                        <td class="${v.ganho === 'sim' ? 'ganho-sim' : 'ganho-nao'}">${v.ganho === 'sim' ? '✅ Sim' : '❌ Não'}</td>
+                        <td>${v.data || '-'}</td>
+                        <td><select onchange="alterarContrato('${tipo}',${i},this.value)" style="font-size:11px;padding:6px">
+                            <option ${v.contrato === "Pendente" ? "selected" : ""}>Pendente</option>
+                            <option ${v.contrato === "Assinou" ? "selected" : ""}>Assinou</option>
+                            <option ${v.contrato === "Não Assinou" ? "selected" : ""}>Não Assinou</option>
+                        </select></td>
+                        <td><button class="badge ${badgeClass}" onclick="validarVenda('${tipo}',${i})">${badgeText}</button></td>
+                        <td>
+                            <button class="btn-sm btn-edit" onclick="editarVenda('${tipo}',${i})">✏️</button>
+                            <button class="btn-sm btn-del" onclick="deletarVenda('${tipo}',${i})">🗑️</button>
+                        </td>
+                    </tr>`;
+                }
+            });
+
+            // Bônus meta
+            let bonus = 0;
+            let metaCard = document.getElementById("metaCard" + s);
+            let tipoMeta = c.tipoMeta || "contas";
+
+            if (tipoMeta === "contas") {
+                if (totalContas >= c.meta) {
+                    bonus = c.bonusMeta;
+                    metaCard.classList.add("meta-ok");
+                } else {
+                    metaCard.classList.remove("meta-ok");
+                }
+                if (totalContas >= c.superMeta) bonus = c.bonusSuperMeta;
+            } else {
+                if (totalFaturamento >= (c.metaFat || 0)) {
+                    bonus = c.bonusMetaFat || 0;
+                    metaCard.classList.add("meta-ok");
+                } else {
+                    metaCard.classList.remove("meta-ok");
+                }
+                if (totalFaturamento >= (c.superMetaFat || 0)) bonus = c.bonusSuperMetaFat || 0;
+            }
+
+            if (c.temConversao && c.bateuConversao) {
+                bonus += c.bonusConversao;
+            }
+
+            // Cálculos
+            let salarioFixo = c.salarioFixo;
+            let producao = totalComissao;
+            let bruto = salarioFixo + producao + bonus;
+            let inss = c.inss;
+            let despesa = bruto * (c.despesaPct / 100);
+            let liquido = bruto - inss - despesa;
+
+            // Mostrar
+            document.getElementById("salarioFixo" + s).innerText = salarioFixo.toFixed(2);
+            document.getElementById("comissao" + s).innerText = producao.toFixed(2);
+            document.getElementById("bonus" + s).innerText = bonus.toFixed(2);
+            document.getElementById("bruto" + s).innerText = bruto.toFixed(2);
+            document.getElementById("inssVal" + s).innerText = inss.toFixed(2);
+            document.getElementById("despesaVal" + s).innerText = despesa.toFixed(2);
+            document.getElementById("vendasRealizadas" + s).innerText = totalVendasRealizadas;
+            document.getElementById("faturamentoTotal" + s).innerText = totalFaturamento.toFixed(2);
+            document.getElementById("contasMeta" + s).innerText = tipoMeta === "contas" ? totalContas : totalFaturamento.toFixed(0);
+            document.getElementById("totalFinal" + s).innerText = liquido.toFixed(2);
+        }
+
+        // ===== INIT =====
+        document.getElementById("filtroMesSdr").addEventListener("change", () => atualizar("sdr"));
+        document.getElementById("filtroMesCloser").addEventListener("change", () => atualizar("closer"));
+
+        trocarAba(abaAtiva);
+        initConversao("sdr"); initConversao("closer");
+        atualizar("sdr"); atualizar("closer");
+
+    </script>
+
+</body>
+
+</html>
