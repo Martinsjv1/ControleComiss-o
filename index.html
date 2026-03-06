@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Comissões</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a, #020617);
+            color: white;
+            min-height: 100vh
+        }
+
+        /* ===== AUTH SCREEN ===== */
+        #authScreen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px
+        }
+
+        .auth-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5)
+        }
+
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 30px
+        }
+
+        .auth-logo h1 {
+            margin: 0;
+            font-size: 26px;
+            font-weight: 800
+        }
+
+        .auth-logo p {
+            margin: 6px 0 0;
+            color: #64748b;
+            font-size: 13px
+        }
+
+        .auth-tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 24px
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 9px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            color: #64748b;
+            background: transparent;
+            transition: all .2s
+        }
+
+        .auth-tab.active {
+            background: rgba(99, 102, 241, 0.3);
+            color: #818cf8
+        }
+
+        .auth-group {
+            margin-bottom: 16px
+        }
+
+        .auth-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px
+        }
+
+        .auth-group input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 13px 14px;
+            border-radius: 11px;
+            color: white;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            transition: border-color .2s
+        }
+
+        .auth-group input:focus {
+            border-color: rgba(99, 102, 241, 0.6)
+        }
+
+        .btn-auth {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 11px;
+            background: linear-gradient(90deg, #6366f1, #4f46e5);
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all .2s;
+            margin-top: 4px
+        }
+
+        .btn-auth:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4)
+        }
+
+        .auth-error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 14px;
+            display: none
+        }
+
+        .auth-loading {
+            text-align: center;
+            color: #64748b;
+            font-size: 13px;
+            padding: 10px;
+            display: none
+        }
+
+        /* ===== APP ===== */
+        #appScreen {
+            display: none
+        }
+
+        header {
+            padding: 20px 25px 0;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px)
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1px
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .user-email {
+            font-size: 12px;
+            color: #64748b;
+            max-width: 160px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap
+        }
+
+        .btn-logout {
+            padding: 7px 14px;
+            border: none;
+            border-radius: 9px;
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .btn-logout:hover {
+            background: rgba(239, 68, 68, 0.3)
+        }
+
+        .tabs {
+            display: flex;
+            gap: 4px
+        }
+
+        .tab {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 12px 12px 0 0;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: .5px;
+            background: rgba(255, 255, 255, 0.04);
+            color: #64748b;
+            transition: all .3s;
+            position: relative
+        }
+
+        .tab:hover {
+            color: #94a3b8;
+            background: rgba(255, 255, 255, 0.06)
+        }
+
+        .tab.active {
+            background: rgba(255, 255, 255, 0.08);
+            color: white
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 3px;
+            border-radius: 3px 3px 0 0;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6)
+        }
+
+        .container {
+            padding: 25px
+        }
+
+        .sheet {
+            display: none
+        }
+
+        .sheet.active {
+            display: block
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            transition: .3s
+        }
+
+        .card:hover {
+            transform: translateY(-4px)
+        }
+
+        .card h3 {
+            margin: 0 0 15px;
+            font-size: 16px;
+            letter-spacing: .5px
+        }
+
+        /* ===== FORM ===== */
+        .form-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center
+        }
+
+        input,
+        select {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 11px 14px;
+            border-radius: 10px;
+            color: white;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            transition: border-color .2s
+        }
+
+        input:focus,
+        select:focus {
+            border-color: rgba(99, 102, 241, 0.6)
+        }
+
+        select {
+            appearance: none;
+            background: rgba(255, 255, 255, 0.08) url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>") no-repeat right 8px center;
+            background-size: 16px;
+            padding-right: 30px;
+            cursor: pointer
+        }
+
+        option {
+            background: #1e293b;
+            color: #e2e8f0
+        }
+
+        button {
+            padding: 11px 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            transition: all .2s
+        }
+
+        button:hover {
+            transform: translateY(-1px)
+        }
+
+        button:active {
+            transform: scale(.98)
+        }
+
+        .btn-add {
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            color: black
+        }
+
+        /* ===== SUMMARY ===== */
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px
+        }
+
+        .summary div {
+            background: rgba(255, 255, 255, 0.06);
+            padding: 16px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 13px
+        }
+
+        .summary .big {
+            font-size: 17px
+        }
+
+        .meta-ok {
+            background: linear-gradient(90deg, #22c55e, #15803d) !important
+        }
+
+        /* ===== TABLE ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin-top: 12px
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            white-space: nowrap
+        }
+
+        th,
+        td {
+            padding: 10px 8px;
+            font-size: 12px;
+            text-align: left
+        }
+
+        th {
+            color: #94a3b8;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: sticky;
+            top: 0;
+            background: rgba(15, 23, 42, .9)
+        }
+
+        tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04)
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.03)
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 11px;
+            border-radius: 6px;
+            margin: 1px
+        }
+
+        .btn-edit {
+            background: rgba(99, 102, 241, 0.2);
+            color: #818cf8
+        }
+
+        .btn-edit:hover {
+            background: rgba(99, 102, 241, 0.35)
+        }
+
+        .btn-del {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444
+        }
+
+        .btn-del:hover {
+            background: rgba(239, 68, 68, 0.3)
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: .5px;
+            transition: all .2s
+        }
+
+        .badge-pendente {
+            background: rgba(234, 179, 8, 0.15);
+            color: #eab308
+        }
+
+        .badge-validado {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e
+        }
+
+        .badge-pendente:hover {
+            background: rgba(234, 179, 8, 0.3)
+        }
+
+        .badge-validado:hover {
+            background: rgba(34, 197, 94, 0.3)
+        }
+
+        /* ===== SETTINGS BTN ===== */
+        .settings-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            font-size: 20px;
+            color: white;
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .3s;
+            z-index: 100
+        }
+
+        .settings-btn:hover {
+            transform: translateY(-3px) rotate(90deg);
+            box-shadow: 0 12px 40px rgba(99, 102, 241, 0.6)
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            z-index: 200
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 28px;
+            border-radius: 20px;
+            width: 440px;
+            max-width: 92vw;
+            max-height: 88vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+            animation: slideUp .3s ease
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 17px
+        }
+
+        .modal-close {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            color: #94a3b8;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0
+        }
+
+        .modal-close:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444
+        }
+
+        .config-group {
+            margin-bottom: 16px
+        }
+
+        .config-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px
+        }
+
+        .config-group input,
+        .config-group select {
+            width: 100%;
+            margin: 0;
+            padding: 12px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08)
+        }
+
+        .config-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px
+        }
+
+        .config-divider {
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            margin: 16px 0
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 13px;
+            font-size: 14px
+        }
+
+        .btn-save {
+            background: linear-gradient(90deg, #6366f1, #4f46e5);
+            color: white
+        }
+
+        .btn-cancel {
+            background: rgba(255, 255, 255, 0.06);
+            color: #94a3b8
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white
+        }
+
+        /* ===== CONVERSÃO ===== */
+        .conversao-section {
+            margin-top: 18px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px
+        }
+
+        .conversao-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between
+        }
+
+        .conversao-header span {
+            font-weight: 700;
+            font-size: 14px
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            cursor: pointer
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            position: absolute
+        }
+
+        .toggle-slider {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 26px;
+            transition: .3s
+        }
+
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: .3s
+        }
+
+        .toggle-switch input:checked+.toggle-slider {
+            background: linear-gradient(90deg, #22c55e, #15803d)
+        }
+
+        .toggle-switch input:checked+.toggle-slider::before {
+            transform: translateX(22px)
+        }
+
+        .conversao-config {
+            display: none;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06)
+        }
+
+        .conversao-config.show {
+            display: block
+        }
+
+        .conversao-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px
+        }
+
+        .conversao-row label {
+            font-size: 13px;
+            color: #94a3b8;
+            min-width: 110px
+        }
+
+        .conversao-row input {
+            width: 120px;
+            margin: 0;
+            padding: 10px;
+            font-size: 14px
+        }
+
+        .bateu-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px
+        }
+
+        .bateu-btn span {
+            font-size: 13px;
+            color: #94a3b8
+        }
+
+        .bateu-status {
+            font-size: 12px;
+            margin-left: auto;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600
+        }
+
+        .bateu-status.sim {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e
+        }
+
+        .bateu-status.nao {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444
+        }
+
+        .ganho-sim {
+            color: #22c55e
+        }
+
+        .ganho-nao {
+            color: #ef4444
+        }
+
+        .saving-indicator {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity .3s;
+            z-index: 999;
+            pointer-events: none
+        }
+
+        .saving-indicator.show {
+            opacity: 1
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ===== AUTH SCREEN ===== -->
+    <div id="authScreen">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <h1>💰 Comissões</h1>
+                <p>Actuaré Facilfit · Dashboard</p>
+            </div>
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="setAuthTab('login')" id="tabLogin">Entrar</button>
+                <button class="auth-tab" onclick="setAuthTab('register')" id="tabRegister">Cadastrar</button>
+            </div>
+            <div class="auth-error" id="authError"></div>
+            <div class="auth-group"><label>Email</label><input type="email" id="authEmail"
+                    placeholder="email@exemplo.com"></div>
+            <div class="auth-group"><label>Senha</label><input type="password" id="authPassword"
+                    placeholder="Mínimo 6 caracteres"></div>
+            <div class="auth-loading" id="authLoading">Aguarde...</div>
+            <button class="btn-auth" onclick="submitAuth()" id="btnAuth">Entrar</button>
+        </div>
+    </div>
+
+    <div class="saving-indicator" id="savingIndicator">✓ Salvo</div>
+
+    <!-- ===== APP SCREEN ===== -->
+    <div id="appScreen">
+        <header>
+            <div class="header-top">
+                <h1>💰 Dashboard Comissões</h1>
+                <div class="user-info">
+                    <span class="user-email" id="userEmailDisplay"></span>
+                    <button class="btn-logout" onclick="logout()">Sair</button>
+                </div>
+            </div>
+            <div class="tabs">
+                <button class="tab active" onclick="trocarAba('sdr')" id="tabSdr">📞 SDR</button>
+                <button class="tab" onclick="trocarAba('closer')" id="tabCloser">🤝 Closer</button>
+            </div>
+        </header>
+
+        <div class="container">
+            <!-- SDR -->
+            <div class="sheet active" id="sheetSdr">
+                <div class="card"><input type="month" id="filtroMesSdr"></div>
+                <div class="card">
+                    <h3>Lançar Venda · SDR</h3>
+                    <div class="form-grid">
+                        <input placeholder="ID" id="idSdr" style="width:70px">
+                        <input placeholder="Cliente" id="clienteSdr">
+                        <input placeholder="Telefone" id="telefoneSdr" style="width:120px">
+                        <select id="sdrNome">
+                            <option value="">SDR</option>
+                            <option>João Martins</option>
+                            <option>Neder</option>
+                            <option>Muller</option>
+                            <option>Wesley</option>
+                            <option>Ton</option>
+                            <option>Guilherme Moura</option>
+                            <option>Allan</option>
+                            <option>Paulo</option>
+                            <option>Rodolpho</option>
+                            <option>Edilson</option>
+                            <option>Wender</option>
+                        </select>
+                        <select id="closerSdr">
+                            <option value="">Closer</option>
+                            <option>Josué</option>
+                            <option>Parreira</option>
+                            <option>Higor</option>
+                            <option>Penha</option>
+                            <option>João Barbosa</option>
+                            <option>Lucas Henrique</option>
+                        </select>
+                        <select id="contasSdr">
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                            <option>6</option>
+                            <option>7</option>
+                            <option>8</option>
+                            <option>9</option>
+                            <option>10</option>
+                        </select>
+                        <input type="number" placeholder="Comissão (R$)" id="comissaoManualSdr" style="width:120px">
+                        <input type="number" placeholder="Valor Vendido (R$)" id="valorVendidoSdr" style="width:130px">
+                        <select id="ganhoSdr">
+                            <option value="sim">Ganho</option>
+                            <option value="nao">Não Ganho</option>
+                        </select>
+                        <input type="date" id="dataVendaSdr">
+                        <button class="btn-add" onclick="addVenda('sdr')">Adicionar</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Registros</h3>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Cliente</th>
+                                    <th>Tel</th>
+                                    <th>SDR</th>
+                                    <th>Closer</th>
+                                    <th>Contas</th>
+                                    <th>Comissão</th>
+                                    <th>Valor Vendido</th>
+                                    <th>Ganho</th>
+                                    <th>Data</th>
+                                    <th>Contrato</th>
+                                    <th>RH</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaSdr"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Resumo Financeiro · SDR</h3>
+                    <div class="summary">
+                        <div>Salário Fixo<br><b>R$ <span id="salarioFixoSdr">0</span></b></div>
+                        <div>Comissões<br><b>R$ <span id="comissaoSdr">0</span></b></div>
+                        <div>Bônus<br><b>R$ <span id="bonusSdr">0</span></b></div>
+                        <div style="font-weight:800">Bruto<br><b>R$ <span id="brutoSdr">0</span></b></div>
+                        <div style="color:#ef4444">INSS<br><b>-R$ <span id="inssValSdr">0</span></b></div>
+                        <div style="color:#ef4444">Despesa 4,5%<br><b>-R$ <span id="despesaValSdr">0</span></b></div>
+                        <div>Vendas Totais<br><b><span id="vendasRealizadasSdr">0</span></b></div>
+                        <div>Faturamento Total<br><b>R$ <span id="faturamentoTotalSdr">0</span></b></div>
+                        <div id="metaCardSdr">Contas/Fat Meta<br><b><span id="contasMetaSdr">0</span></b></div>
+                        <div class="big" style="color:#22c55e">Líquido<br><b>R$ <span id="totalFinalSdr">0</span></b>
+                        </div>
+                    </div>
+                    <div class="conversao-section">
+                        <div class="conversao-header"><span>🎯 Conversão</span><label class="toggle-switch"><input
+                                    type="checkbox" id="temConversaoSdr" onchange="toggleTemConversao('sdr')"><span
+                                    class="toggle-slider"></span></label></div>
+                        <div class="conversao-config" id="conversaoConfigSdr">
+                            <div class="conversao-row"><label>Bônus (R$):</label><input type="number"
+                                    id="bonusConversaoInputSdr" placeholder="300"
+                                    onchange="salvarBonusConversao('sdr')"></div>
+                            <div class="bateu-btn"><span>Bateu conversão?</span><label class="toggle-switch"><input
+                                        type="checkbox" id="bateuConversaoToggleSdr"
+                                        onchange="toggleBateuConversao('sdr')"><span
+                                        class="toggle-slider"></span></label><span class="bateu-status nao"
+                                    id="bateuStatusSdr">NÃO</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CLOSER -->
+            <div class="sheet" id="sheetCloser">
+                <div class="card"><input type="month" id="filtroMesCloser"></div>
+                <div class="card">
+                    <h3>Lançar Venda · Closer</h3>
+                    <div class="form-grid">
+                        <input placeholder="ID" id="idCloser" style="width:70px">
+                        <input placeholder="Cliente" id="clienteCloser">
+                        <input placeholder="Telefone" id="telefoneCloser" style="width:120px">
+                        <select id="sdrNomeCloser">
+                            <option value="">SDR</option>
+                            <option>João Martins</option>
+                            <option>Neder</option>
+                            <option>Muller</option>
+                            <option>Wesley</option>
+                            <option>Ton</option>
+                            <option>Guilherme Moura</option>
+                            <option>Allan</option>
+                            <option>Paulo</option>
+                            <option>Rodolpho</option>
+                            <option>Edilson</option>
+                            <option>Wender</option>
+                        </select>
+                        <select id="closerNome">
+                            <option value="">Closer</option>
+                            <option>Josué</option>
+                            <option>Parreira</option>
+                            <option>Higor</option>
+                            <option>Penha</option>
+                            <option>João Barbosa</option>
+                            <option>Lucas Henrique</option>
+                        </select>
+                        <select id="contasCloser">
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                            <option>6</option>
+                            <option>7</option>
+                            <option>8</option>
+                            <option>9</option>
+                            <option>10</option>
+                        </select>
+                        <input type="number" placeholder="Comissão (R$)" id="comissaoManualCloser" style="width:120px">
+                        <input type="number" placeholder="Valor Vendido (R$)" id="valorVendidoCloser"
+                            style="width:130px">
+                        <select id="ganhoCloser">
+                            <option value="sim">Ganho</option>
+                            <option value="nao">Não Ganho</option>
+                        </select>
+                        <input type="date" id="dataVendaCloser">
+                        <button class="btn-add" onclick="addVenda('closer')">Adicionar</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Registros</h3>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Cliente</th>
+                                    <th>Tel</th>
+                                    <th>SDR</th>
+                                    <th>Closer</th>
+                                    <th>Contas</th>
+                                    <th>Comissão</th>
+                                    <th>Valor Vendido</th>
+                                    <th>Ganho</th>
+                                    <th>Data</th>
+                                    <th>Contrato</th>
+                                    <th>RH</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaCloser"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Resumo Financeiro · Closer</h3>
+                    <div class="summary">
+                        <div>Salário Fixo<br><b>R$ <span id="salarioFixoCloser">0</span></b></div>
+                        <div>Comissões<br><b>R$ <span id="comissaoCloser">0</span></b></div>
+                        <div>Bônus<br><b>R$ <span id="bonusCloser">0</span></b></div>
+                        <div style="font-weight:800">Bruto<br><b>R$ <span id="brutoCloser">0</span></b></div>
+                        <div style="color:#ef4444">INSS<br><b>-R$ <span id="inssValCloser">0</span></b></div>
+                        <div style="color:#ef4444">Despesa 4,5%<br><b>-R$ <span id="despesaValCloser">0</span></b></div>
+                        <div>Vendas Totais<br><b><span id="vendasRealizadasCloser">0</span></b></div>
+                        <div>Faturamento Total<br><b>R$ <span id="faturamentoTotalCloser">0</span></b></div>
+                        <div id="metaCardCloser">Contas/Fat Meta<br><b><span id="contasMetaCloser">0</span></b></div>
+                        <div class="big" style="color:#22c55e">Líquido<br><b>R$ <span id="totalFinalCloser">0</span></b>
+                        </div>
+                    </div>
+                    <div class="conversao-section">
+                        <div class="conversao-header"><span>🎯 Conversão</span><label class="toggle-switch"><input
+                                    type="checkbox" id="temConversaoCloser"
+                                    onchange="toggleTemConversao('closer')"><span class="toggle-slider"></span></label>
+                        </div>
+                        <div class="conversao-config" id="conversaoConfigCloser">
+                            <div class="conversao-row"><label>Bônus (R$):</label><input type="number"
+                                    id="bonusConversaoInputCloser" placeholder="300"
+                                    onchange="salvarBonusConversao('closer')"></div>
+                            <div class="bateu-btn"><span>Bateu conversão?</span><label class="toggle-switch"><input
+                                        type="checkbox" id="bateuConversaoToggleCloser"
+                                        onchange="toggleBateuConversao('closer')"><span
+                                        class="toggle-slider"></span></label><span class="bateu-status nao"
+                                    id="bateuStatusCloser">NÃO</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="settings-btn" onclick="abrirConfig()">⚙</button>
+
+        <!-- Config Modal -->
+        <div class="modal-overlay" id="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>⚙ Configurações · <span id="modalTipo">SDR</span></h3><button class="modal-close"
+                        onclick="fecharConfig()">✕</button>
+                </div>
+                <div class="config-group"><label>Tipo de Meta</label><select id="cfgTipoMeta"
+                        onchange="alternarCamposMeta()">
+                        <option value="contas">Por Contas</option>
+                        <option value="faturamento">Por Faturamento</option>
+                    </select></div>
+                <div id="metaContasCampos">
+                    <div class="config-row">
+                        <div class="config-group"><label>Contas Meta</label><input type="number" id="cfgMeta"></div>
+                        <div class="config-group"><label>Bônus Meta (R$)</label><input type="number" id="cfgBonusMeta">
+                        </div>
+                    </div>
+                    <hr class="config-divider">
+                    <div class="config-row">
+                        <div class="config-group"><label>Contas Super Meta</label><input type="number"
+                                id="cfgSuperMeta"></div>
+                        <div class="config-group"><label>Bônus Super Meta (R$)</label><input type="number"
+                                id="cfgBonusSuperMeta"></div>
+                    </div>
+                </div>
+                <div id="metaFaturamentoCampos" style="display:none">
+                    <div class="config-row">
+                        <div class="config-group"><label>Faturamento Meta (R$)</label><input type="number"
+                                id="cfgMetaFat"></div>
+                        <div class="config-group"><label>Bônus Meta (R$)</label><input type="number"
+                                id="cfgBonusMetaFat"></div>
+                    </div>
+                    <hr class="config-divider">
+                    <div class="config-row">
+                        <div class="config-group"><label>Faturamento Super Meta (R$)</label><input type="number"
+                                id="cfgSuperMetaFat"></div>
+                        <div class="config-group"><label>Bônus Super Meta (R$)</label><input type="number"
+                                id="cfgBonusSuperMetaFat"></div>
+                    </div>
+                </div>
+                <div class="modal-actions"><button class="btn-cancel" onclick="fecharConfig()">Cancelar</button><button
+                        class="btn-save" onclick="salvarConfig()">Salvar</button></div>
+            </div>
+        </div>
+
+        <!-- Edit Modal -->
+        <div class="modal-overlay" id="editModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>✏️ Editar Venda</h3><button class="modal-close" onclick="fecharEdit()">✕</button>
+                </div>
+                <div class="config-group"><label>ID</label><input id="editId"></div>
+                <div class="config-group"><label>Cliente</label><input id="editCliente"></div>
+                <div class="config-group"><label>Telefone</label><input id="editTelefone"></div>
+                <div class="config-group"><label>SDR</label><select id="editSdr">
+                        <option value="">SDR</option>
+                        <option>João Martins</option>
+                        <option>Neder</option>
+                        <option>Muller</option>
+                        <option>Wesley</option>
+                        <option>Ton</option>
+                        <option>Guilherme Moura</option>
+                        <option>Allan</option>
+                        <option>Paulo</option>
+                        <option>Rodolpho</option>
+                        <option>Edilson</option>
+                        <option>Wender</option>
+                    </select></div>
+                <div class="config-group"><label>Closer</label><select id="editCloser">
+                        <option value="">Closer</option>
+                        <option>Josué</option>
+                        <option>Parreira</option>
+                        <option>Higor</option>
+                        <option>Penha</option>
+                        <option>João Barbosa</option>
+                        <option>Lucas Henrique</option>
+                    </select></div>
+                <div class="config-row">
+                    <div class="config-group"><label>Contas</label><select id="editContas">
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                            <option>6</option>
+                            <option>7</option>
+                            <option>8</option>
+                            <option>9</option>
+                            <option>10</option>
+                        </select></div>
+                    <div class="config-group"><label>Comissão (R$)</label><input type="number" id="editComissao"></div>
+                </div>
+                <div class="config-group"><label>Valor Vendido (R$)</label><input type="number" id="editValorVendido">
+                </div>
+                <div class="config-row">
+                    <div class="config-group"><label>Ganho</label><select id="editGanho">
+                            <option value="sim">Ganho</option>
+                            <option value="nao">Não Ganho</option>
+                        </select></div>
+                    <div class="config-group"><label>Data</label><input type="date" id="editData"></div>
+                </div>
+                <div class="config-group"><label>Contrato</label><select id="editContrato">
+                        <option>Pendente</option>
+                        <option>Assinou</option>
+                        <option>Não Assinou</option>
+                    </select></div>
+                <div class="modal-actions"><button class="btn-cancel" onclick="fecharEdit()">Cancelar</button><button
+                        class="btn-save" onclick="salvarEdicao()">Salvar</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ===== FIREBASE CONFIG =====
+        const firebaseConfig = {
+            apiKey: "AIzaSyAGdpGH7d9CBKPmZpczvy1D8jxDy8ZC7ws",
+            authDomain: "comissaoactuarefacilfit.firebaseapp.com",
+            projectId: "comissaoactuarefacilfit",
+            storageBucket: "comissaoactuarefacilfit.firebasestorage.app",
+            messagingSenderId: "310650502233",
+            appId: "1:310650502233:web:6fefa8c94fa5f3e17c8548",
+            measurementId: "G-2XFZG9JBRB"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ===== STATE =====
+        let currentUser = null;
+        let abaAtiva = "sdr";
+        let vendasCache = { sdr: [], closer: [] }; // {docId, ...data}
+
+        let defaultCfg = {
+            sdr: { salarioFixo: 2500, inss: 324.20, despesaPct: 4.50, tipoMeta: "contas", meta: 20, superMeta: 30, bonusMeta: 500, bonusSuperMeta: 1000, metaFat: 10000, superMetaFat: 20000, bonusMetaFat: 500, bonusSuperMetaFat: 1000, bonusConversao: 300, temConversao: false, bateuConversao: false },
+            closer: { salarioFixo: 2250, inss: 324.20, despesaPct: 4.50, tipoMeta: "contas", meta: 20, superMeta: 30, bonusMeta: 500, bonusSuperMeta: 1000, metaFat: 15000, superMetaFat: 30000, bonusMetaFat: 500, bonusSuperMetaFat: 1000, bonusConversao: 300, temConversao: false, bateuConversao: false }
+        };
+        let configSdr = { ...defaultCfg.sdr };
+        let configCloser = { ...defaultCfg.closer };
+
+        let editDocId = null, editTipo = "";
+
+        // ===== UTILS =====
+        function sfx(t) { return t === "sdr" ? "Sdr" : "Closer" }
+        function cfg(t) { return t === "sdr" ? configSdr : configCloser }
+
+        function showSaving() {
+            const el = document.getElementById("savingIndicator");
+            el.classList.add("show");
+            setTimeout(() => el.classList.remove("show"), 1500);
+        }
+
+        function userRef() { return db.collection("users").doc(currentUser.uid) }
+
+        // ===== AUTH =====
+        let authMode = "login";
+        function setAuthTab(mode) {
+            authMode = mode;
+            document.getElementById("tabLogin").classList.toggle("active", mode === "login");
+            document.getElementById("tabRegister").classList.toggle("active", mode === "register");
+            document.getElementById("btnAuth").textContent = mode === "login" ? "Entrar" : "Cadastrar";
+            document.getElementById("authError").style.display = "none";
+        }
+
+        function showAuthError(msg) {
+            const el = document.getElementById("authError");
+            el.textContent = msg; el.style.display = "block";
+        }
+
+        function setAuthLoading(v) {
+            document.getElementById("authLoading").style.display = v ? "block" : "none";
+            document.getElementById("btnAuth").style.display = v ? "none" : "block";
+        }
+
+        async function submitAuth() {
+            const email = document.getElementById("authEmail").value.trim();
+            const pass = document.getElementById("authPassword").value;
+            document.getElementById("authError").style.display = "none";
+            if (!email || !pass) { showAuthError("Preencha email e senha."); return }
+            setAuthLoading(true);
+            try {
+                if (authMode === "login") {
+                    await auth.signInWithEmailAndPassword(email, pass);
+                } else {
+                    await auth.createUserWithEmailAndPassword(email, pass);
+                }
+            } catch (e) {
+                let msg = "Erro ao autenticar.";
+                if (e.code === "auth/user-not-found" || e.code === "auth/wrong-password") msg = "Email ou senha incorretos.";
+                else if (e.code === "auth/email-already-in-use") msg = "Email já cadastrado. Faça login.";
+                else if (e.code === "auth/weak-password") msg = "Senha muito fraca (mínimo 6 caracteres).";
+                else if (e.code === "auth/invalid-email") msg = "Email inválido.";
+                else if (e.code === "auth/invalid-credential") msg = "Email ou senha incorretos.";
+                showAuthError(msg);
+                setAuthLoading(false);
+            }
+        }
+
+        document.getElementById("authPassword").addEventListener("keydown", e => { if (e.key === "Enter") submitAuth() });
+
+        async function logout() {
+            await auth.signOut();
+        }
+
+        // ===== AUTH STATE OBSERVER =====
+        auth.onAuthStateChanged(async user => {
+            if (user) {
+                currentUser = user;
+                document.getElementById("authScreen").style.display = "none";
+                document.getElementById("appScreen").style.display = "block";
+                document.getElementById("userEmailDisplay").textContent = user.email;
+                setAuthLoading(false);
+                await carregarConfigs();
+                initConversao("sdr"); initConversao("closer");
+                trocarAba(abaAtiva);
+                carregarVendas("sdr");
+                carregarVendas("closer");
+            } else {
+                currentUser = null;
+                document.getElementById("authScreen").style.display = "flex";
+                document.getElementById("appScreen").style.display = "none";
+                setAuthLoading(false);
+            }
+        });
+
+        // ===== FIRESTORE CONFIG =====
+        async function carregarConfigs() {
+            try {
+                const docSdr = await userRef().collection("config").doc("sdr").get();
+                if (docSdr.exists) configSdr = { ...defaultCfg.sdr, ...docSdr.data() };
+                const docC = await userRef().collection("config").doc("closer").get();
+                if (docC.exists) configCloser = { ...defaultCfg.closer, ...docC.data() };
+            } catch (e) { console.warn("Erro ao carregar configs", e) }
+        }
+
+        async function saveCfg(tipo) {
+            if (!currentUser) return;
+            try {
+                await userRef().collection("config").doc(tipo).set(cfg(tipo));
+                showSaving();
+            } catch (e) { console.error("Erro ao salvar config", e) }
+        }
+
+        // ===== FIRESTORE VENDAS =====
+        async function carregarVendas(tipo) {
+            if (!currentUser) return;
+            const filtro = document.getElementById("filtroMes" + sfx(tipo)).value;
+            let q = userRef().collection("vendas").where("tipo", "==", tipo);
+            if (filtro) q = q.where("mesAno", "==", filtro);
+            try {
+                const snap = await q.get();
+                vendasCache[tipo] = snap.docs.map(d => ({ docId: d.id, ...d.data() }));
+                renderTabela(tipo);
+                calcResumo(tipo);
+            } catch (e) { console.error("Erro ao carregar vendas", e) }
+        }
+
+        async function salvarVendaFirestore(tipo, obj) {
+            if (!currentUser) return null;
+            // mesAno ex: "2026-03" para indexação
+            obj.mesAno = obj.data ? obj.data.substring(0, 7) : "";
+            obj.tipo = tipo;
+            const ref = await userRef().collection("vendas").add(obj);
+            showSaving();
+            return ref.id;
+        }
+
+        async function atualizarVendaFirestore(docId, updates) {
+            if (!currentUser) return;
+            await userRef().collection("vendas").doc(docId).update(updates);
+            showSaving();
+        }
+
+        async function deletarVendaFirestore(docId) {
+            if (!currentUser) return;
+            await userRef().collection("vendas").doc(docId).delete();
+            showSaving();
+        }
+
+        // ===== TABS =====
+        function trocarAba(tipo) {
+            abaAtiva = tipo;
+            document.getElementById("sheetSdr").classList.toggle("active", tipo === "sdr");
+            document.getElementById("sheetCloser").classList.toggle("active", tipo === "closer");
+            document.getElementById("tabSdr").classList.toggle("active", tipo === "sdr");
+            document.getElementById("tabCloser").classList.toggle("active", tipo === "closer");
+        }
+
+        // ===== CONVERSÃO =====
+        function initConversao(tipo) {
+            let c = cfg(tipo), s = sfx(tipo);
+            document.getElementById("temConversao" + s).checked = c.temConversao || false;
+            document.getElementById("bateuConversaoToggle" + s).checked = c.bateuConversao || false;
+            document.getElementById("bonusConversaoInput" + s).value = c.bonusConversao || 300;
+            document.getElementById("conversaoConfig" + s).classList.toggle("show", !!c.temConversao);
+            atualizarBateuStatus(tipo);
+        }
+
+        function toggleTemConversao(tipo) {
+            let c = cfg(tipo), s = sfx(tipo);
+            c.temConversao = document.getElementById("temConversao" + s).checked;
+            document.getElementById("conversaoConfig" + s).classList.toggle("show", c.temConversao);
+            saveCfg(tipo); calcResumo(tipo);
+        }
+
+        function toggleBateuConversao(tipo) {
+            let c = cfg(tipo), s = sfx(tipo);
+            c.bateuConversao = document.getElementById("bateuConversaoToggle" + s).checked;
+            atualizarBateuStatus(tipo); saveCfg(tipo); calcResumo(tipo);
+        }
+
+        function atualizarBateuStatus(tipo) {
+            let c = cfg(tipo), el = document.getElementById("bateuStatus" + sfx(tipo));
+            el.textContent = c.bateuConversao ? "SIM ✅" : "NÃO";
+            el.className = "bateu-status " + (c.bateuConversao ? "sim" : "nao");
+        }
+
+        function salvarBonusConversao(tipo) {
+            cfg(tipo).bonusConversao = parseFloat(document.getElementById("bonusConversaoInput" + sfx(tipo)).value) || 0;
+            saveCfg(tipo); calcResumo(tipo);
+        }
+
+        // ===== SETTINGS =====
+        function abrirConfig() {
+            document.getElementById("modal").style.display = "flex";
+            let c = cfg(abaAtiva);
+            document.getElementById("modalTipo").textContent = abaAtiva.toUpperCase();
+            cfgTipoMeta.value = c.tipoMeta || "contas";
+            cfgMeta.value = c.meta; cfgBonusMeta.value = c.bonusMeta;
+            cfgSuperMeta.value = c.superMeta; cfgBonusSuperMeta.value = c.bonusSuperMeta;
+            cfgMetaFat.value = c.metaFat || 0; cfgBonusMetaFat.value = c.bonusMetaFat || 0;
+            cfgSuperMetaFat.value = c.superMetaFat || 0; cfgBonusSuperMetaFat.value = c.bonusSuperMetaFat || 0;
+            alternarCamposMeta();
+        }
+
+        function alternarCamposMeta() {
+            let t = cfgTipoMeta.value;
+            document.getElementById("metaContasCampos").style.display = t === "contas" ? "block" : "none";
+            document.getElementById("metaFaturamentoCampos").style.display = t === "faturamento" ? "block" : "none";
+        }
+
+        function fecharConfig() { document.getElementById("modal").style.display = "none" }
+
+        async function salvarConfig() {
+            let c = cfg(abaAtiva);
+            c.tipoMeta = cfgTipoMeta.value;
+            c.meta = parseInt(cfgMeta.value); c.bonusMeta = parseFloat(cfgBonusMeta.value);
+            c.superMeta = parseInt(cfgSuperMeta.value); c.bonusSuperMeta = parseFloat(cfgBonusSuperMeta.value);
+            c.metaFat = parseFloat(cfgMetaFat.value); c.bonusMetaFat = parseFloat(cfgBonusMetaFat.value);
+            c.superMetaFat = parseFloat(cfgSuperMetaFat.value); c.bonusSuperMetaFat = parseFloat(cfgBonusSuperMetaFat.value);
+            await saveCfg(abaAtiva); fecharConfig(); calcResumo(abaAtiva);
+        }
+
+        document.getElementById("modal").addEventListener("click", e => { if (e.target === document.getElementById("modal")) fecharConfig() });
+
+        // ===== ADD VENDA =====
+        async function addVenda(tipo) {
+            let s = sfx(tipo);
+            let obj = {
+                id: document.getElementById("id" + s).value,
+                cliente: document.getElementById("cliente" + s).value,
+                telefone: document.getElementById("telefone" + s).value,
+                contas: parseInt(document.getElementById("contas" + s).value),
+                comissao: parseFloat(document.getElementById("comissaoManual" + s).value) || 0,
+                valorVendido: parseFloat(document.getElementById("valorVendido" + s).value) || 0,
+                ganho: document.getElementById("ganho" + s).value,
+                data: document.getElementById("dataVenda" + s).value,
+                contrato: "Pendente",
+                validado: false,
+                sdr: tipo === "sdr" ? document.getElementById("sdrNome").value : document.getElementById("sdrNomeCloser").value,
+                closer: tipo === "sdr" ? document.getElementById("closerSdr").value : document.getElementById("closerNome").value
+            };
+            const docId = await salvarVendaFirestore(tipo, obj);
+            if (docId) {
+                obj.docId = docId;
+                vendasCache[tipo].push(obj);
+                renderTabela(tipo);
+                calcResumo(tipo);
+                // Limpar campos
+                ["id", "cliente", "telefone", "comissaoManual", "valorVendido", "dataVenda"].forEach(f => {
+                    const el = document.getElementById(f + s); if (el) el.value = "";
+                });
+            }
+        }
+
+        // ===== DELETE =====
+        async function deletarVenda(docId, tipo) {
+            if (!confirm("Excluir esta venda?")) return;
+            await deletarVendaFirestore(docId);
+            vendasCache[tipo] = vendasCache[tipo].filter(v => v.docId !== docId);
+            renderTabela(tipo); calcResumo(tipo);
+        }
+
+        // ===== EDIT =====
+        function editarVenda(docId, tipo) {
+            editDocId = docId; editTipo = tipo;
+            let v = vendasCache[tipo].find(x => x.docId === docId);
+            if (!v) return;
+            editId.value = v.id || "";
+            editCliente.value = v.cliente || "";
+            editTelefone.value = v.telefone || "";
+            editContas.value = v.contas;
+            editComissao.value = v.comissao || 0;
+            editValorVendido.value = v.valorVendido || 0;
+            editGanho.value = v.ganho;
+            editData.value = v.data || "";
+            editContrato.value = v.contrato || "Pendente";
+            editSdr.value = v.sdr || "";
+            editCloser.value = v.closer || "";
+            document.getElementById("editModal").style.display = "flex";
+        }
+
+        function fecharEdit() { document.getElementById("editModal").style.display = "none" }
+
+        async function salvarEdicao() {
+            let updates = {
+                id: editId.value, cliente: editCliente.value, telefone: editTelefone.value,
+                contas: parseInt(editContas.value), comissao: parseFloat(editComissao.value) || 0,
+                valorVendido: parseFloat(editValorVendido.value) || 0, ganho: editGanho.value,
+                data: editData.value, contrato: editContrato.value,
+                sdr: editSdr.value, closer: editCloser.value,
+                mesAno: editData.value ? editData.value.substring(0, 7) : ""
+            };
+            await atualizarVendaFirestore(editDocId, updates);
+            let v = vendasCache[editTipo].find(x => x.docId === editDocId);
+            if (v) Object.assign(v, updates);
+            fecharEdit(); renderTabela(editTipo); calcResumo(editTipo);
+        }
+
+        document.getElementById("editModal").addEventListener("click", e => { if (e.target === document.getElementById("editModal")) fecharEdit() });
+
+        // ===== VALIDAR RH =====
+        async function validarVenda(docId, tipo) {
+            let v = vendasCache[tipo].find(x => x.docId === docId);
+            if (!v) return;
+            v.validado = !v.validado;
+            await atualizarVendaFirestore(docId, { validado: v.validado });
+            renderTabela(tipo);
+        }
+
+        // ===== CONTRATO =====
+        async function alterarContrato(docId, tipo, val) {
+            let v = vendasCache[tipo].find(x => x.docId === docId);
+            if (v) v.contrato = val;
+            await atualizarVendaFirestore(docId, { contrato: val });
+        }
+
+        // ===== RENDER TABLE =====
+        function renderTabela(tipo) {
+            let s = sfx(tipo);
+            let filtro = document.getElementById("filtroMes" + s).value;
+            let lista = document.getElementById("lista" + s);
+            lista.innerHTML = "";
+            let vds = vendasCache[tipo];
+            if (filtro) vds = vds.filter(v => v.data && v.data.startsWith(filtro));
+            vds.forEach(v => {
+                let badgeClass = v.validado ? "badge-validado" : "badge-pendente";
+                let badgeText = v.validado ? "✅ Validado" : "⏳ Pendente";
+                lista.innerHTML += `<tr>
+      <td>${v.id || '-'}</td>
+      <td>${v.cliente || '-'}</td>
+      <td>${v.telefone || '-'}</td>
+      <td>${v.sdr || '-'}</td>
+      <td>${v.closer || '-'}</td>
+      <td>${v.contas}</td>
+      <td>R$ ${(v.comissao || 0).toFixed(2)}</td>
+      <td>R$ ${(v.valorVendido || 0).toFixed(2)}</td>
+      <td class="${v.ganho === 'sim' ? 'ganho-sim' : 'ganho-nao'}">${v.ganho === 'sim' ? '✅ Sim' : '❌ Não'}</td>
+      <td>${v.data || '-'}</td>
+      <td><select onchange="alterarContrato('${v.docId}','${tipo}',this.value)" style="font-size:11px;padding:6px"><option ${v.contrato === 'Pendente' ? 'selected' : ''}>Pendente</option><option ${v.contrato === 'Assinou' ? 'selected' : ''}>Assinou</option><option ${v.contrato === 'Não Assinou' ? 'selected' : ''}>Não Assinou</option></select></td>
+      <td><button class="badge ${badgeClass}" onclick="validarVenda('${v.docId}','${tipo}')">${badgeText}</button></td>
+      <td>
+        <button class="btn-sm btn-edit" onclick="editarVenda('${v.docId}','${tipo}')">✏️</button>
+        <button class="btn-sm btn-del" onclick="deletarVenda('${v.docId}','${tipo}')">🗑️</button>
+      </td>
+    </tr>`;
+            });
+        }
+
+        // ===== CALC RESUMO =====
+        function calcResumo(tipo) {
+            let s = sfx(tipo), c = cfg(tipo);
+            let filtro = document.getElementById("filtroMes" + s).value;
+            let vds = vendasCache[tipo];
+            if (filtro) vds = vds.filter(v => v.data && v.data.startsWith(filtro));
+
+            let totalComissao = 0, totalContas = 0, totalFaturamento = 0, totalVendas = 0;
+            vds.forEach(v => {
+                if (v.ganho === "sim") {
+                    totalComissao += (v.comissao || 0);
+                    totalContas += v.contas;
+                    totalFaturamento += (v.valorVendido || 0);
+                    totalVendas++;
+                }
+            });
+
+            let bonus = 0;
+            let metaCard = document.getElementById("metaCard" + s);
+            let tipoMeta = c.tipoMeta || "contas";
+            if (tipoMeta === "contas") {
+                if (totalContas >= (c.meta || 0)) { bonus = c.bonusMeta; metaCard.classList.add("meta-ok") } else metaCard.classList.remove("meta-ok");
+                if (totalContas >= (c.superMeta || 0)) bonus = c.bonusSuperMeta;
+            } else {
+                if (totalFaturamento >= (c.metaFat || 0)) { bonus = c.bonusMetaFat || 0; metaCard.classList.add("meta-ok") } else metaCard.classList.remove("meta-ok");
+                if (totalFaturamento >= (c.superMetaFat || 0)) bonus = c.bonusSuperMetaFat || 0;
+            }
+            if (c.temConversao && c.bateuConversao) bonus += c.bonusConversao;
+
+            let salarioFixo = c.salarioFixo, bruto = salarioFixo + totalComissao + bonus;
+            let inss = c.inss, despesa = bruto * (c.despesaPct / 100), liquido = bruto - inss - despesa;
+
+            document.getElementById("salarioFixo" + s).innerText = salarioFixo.toFixed(2);
+            document.getElementById("comissao" + s).innerText = totalComissao.toFixed(2);
+            document.getElementById("bonus" + s).innerText = bonus.toFixed(2);
+            document.getElementById("bruto" + s).innerText = bruto.toFixed(2);
+            document.getElementById("inssVal" + s).innerText = inss.toFixed(2);
+            document.getElementById("despesaVal" + s).innerText = despesa.toFixed(2);
+            document.getElementById("vendasRealizadas" + s).innerText = totalVendas;
+            document.getElementById("faturamentoTotal" + s).innerText = totalFaturamento.toFixed(2);
+            document.getElementById("contasMeta" + s).innerText = tipoMeta === "contas" ? totalContas : totalFaturamento.toFixed(0);
+            document.getElementById("totalFinal" + s).innerText = liquido.toFixed(2);
+        }
+
+        // ===== FILTRO MES =====
+        document.getElementById("filtroMesSdr").addEventListener("change", () => { carregarVendas("sdr") });
+        document.getElementById("filtroMesCloser").addEventListener("change", () => { carregarVendas("closer") });
+
+        // ===== AUTH TAB ENTER =====
+        document.getElementById("authEmail").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("authPassword").focus() });
+    </script>
+</body>
+
+</html>
